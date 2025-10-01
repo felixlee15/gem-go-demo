@@ -302,27 +302,51 @@ func (m *TaskMutation) ResetCompletedAt() {
 	delete(m.clearedFields, task.FieldCompletedAt)
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
-func (m *TaskMutation) SetOwnerID(id int) {
-	m.owner = &id
+// SetOwnerID sets the "owner_id" field.
+func (m *TaskMutation) SetOwnerID(i int) {
+	m.owner = &i
+}
+
+// OwnerID returns the value of the "owner_id" field in the mutation.
+func (m *TaskMutation) OwnerID() (r int, exists bool) {
+	v := m.owner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOwnerID returns the old "owner_id" field's value of the Task entity.
+// If the Task object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TaskMutation) OldOwnerID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOwnerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOwnerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOwnerID: %w", err)
+	}
+	return oldValue.OwnerID, nil
+}
+
+// ResetOwnerID resets all changes to the "owner_id" field.
+func (m *TaskMutation) ResetOwnerID() {
+	m.owner = nil
 }
 
 // ClearOwner clears the "owner" edge to the User entity.
 func (m *TaskMutation) ClearOwner() {
 	m.clearedowner = true
+	m.clearedFields[task.FieldOwnerID] = struct{}{}
 }
 
 // OwnerCleared reports if the "owner" edge to the User entity was cleared.
 func (m *TaskMutation) OwnerCleared() bool {
 	return m.clearedowner
-}
-
-// OwnerID returns the "owner" edge ID in the mutation.
-func (m *TaskMutation) OwnerID() (id int, exists bool) {
-	if m.owner != nil {
-		return *m.owner, true
-	}
-	return
 }
 
 // OwnerIDs returns the "owner" edge IDs in the mutation.
@@ -375,7 +399,7 @@ func (m *TaskMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TaskMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.title != nil {
 		fields = append(fields, task.FieldTitle)
 	}
@@ -387,6 +411,9 @@ func (m *TaskMutation) Fields() []string {
 	}
 	if m.completed_at != nil {
 		fields = append(fields, task.FieldCompletedAt)
+	}
+	if m.owner != nil {
+		fields = append(fields, task.FieldOwnerID)
 	}
 	return fields
 }
@@ -404,6 +431,8 @@ func (m *TaskMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case task.FieldCompletedAt:
 		return m.CompletedAt()
+	case task.FieldOwnerID:
+		return m.OwnerID()
 	}
 	return nil, false
 }
@@ -421,6 +450,8 @@ func (m *TaskMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case task.FieldCompletedAt:
 		return m.OldCompletedAt(ctx)
+	case task.FieldOwnerID:
+		return m.OldOwnerID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Task field %s", name)
 }
@@ -458,6 +489,13 @@ func (m *TaskMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCompletedAt(v)
 		return nil
+	case task.FieldOwnerID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOwnerID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Task field %s", name)
 }
@@ -465,13 +503,16 @@ func (m *TaskMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *TaskMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *TaskMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -527,6 +568,9 @@ func (m *TaskMutation) ResetField(name string) error {
 		return nil
 	case task.FieldCompletedAt:
 		m.ResetCompletedAt()
+		return nil
+	case task.FieldOwnerID:
+		m.ResetOwnerID()
 		return nil
 	}
 	return fmt.Errorf("unknown Task field %s", name)

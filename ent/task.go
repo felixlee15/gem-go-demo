@@ -26,10 +26,11 @@ type Task struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// CompletedAt holds the value of the "completed_at" field.
 	CompletedAt *time.Time `json:"completed_at,omitempty"`
+	// OwnerID holds the value of the "owner_id" field.
+	OwnerID int `json:"owner_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TaskQuery when eager-loading is set.
 	Edges        TaskEdges `json:"edges"`
-	user_tasks   *int
 	selectValues sql.SelectValues
 }
 
@@ -60,14 +61,12 @@ func (*Task) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case task.FieldCompleted:
 			values[i] = new(sql.NullBool)
-		case task.FieldID:
+		case task.FieldID, task.FieldOwnerID:
 			values[i] = new(sql.NullInt64)
 		case task.FieldTitle:
 			values[i] = new(sql.NullString)
 		case task.FieldCreatedAt, task.FieldCompletedAt:
 			values[i] = new(sql.NullTime)
-		case task.ForeignKeys[0]: // user_tasks
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -114,12 +113,11 @@ func (_m *Task) assignValues(columns []string, values []any) error {
 				_m.CompletedAt = new(time.Time)
 				*_m.CompletedAt = value.Time
 			}
-		case task.ForeignKeys[0]:
+		case task.FieldOwnerID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_tasks", value)
+				return fmt.Errorf("unexpected type %T for field owner_id", values[i])
 			} else if value.Valid {
-				_m.user_tasks = new(int)
-				*_m.user_tasks = int(value.Int64)
+				_m.OwnerID = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -175,6 +173,9 @@ func (_m *Task) String() string {
 		builder.WriteString("completed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("owner_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.OwnerID))
 	builder.WriteByte(')')
 	return builder.String()
 }

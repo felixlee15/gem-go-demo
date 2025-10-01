@@ -69,9 +69,9 @@ func (_c *TaskCreate) SetNillableCompletedAt(v *time.Time) *TaskCreate {
 	return _c
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (_c *TaskCreate) SetOwnerID(id int) *TaskCreate {
-	_c.mutation.SetOwnerID(id)
+// SetOwnerID sets the "owner_id" field.
+func (_c *TaskCreate) SetOwnerID(v int) *TaskCreate {
+	_c.mutation.SetOwnerID(v)
 	return _c
 }
 
@@ -136,6 +136,9 @@ func (_c *TaskCreate) check() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Task.created_at"`)}
 	}
+	if _, ok := _c.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner_id", err: errors.New(`ent: missing required field "Task.owner_id"`)}
+	}
 	if len(_c.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Task.owner"`)}
 	}
@@ -195,7 +198,7 @@ func (_c *TaskCreate) createSpec() (*Task, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_tasks = &nodes[0]
+		_node.OwnerID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

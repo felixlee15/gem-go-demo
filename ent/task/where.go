@@ -75,6 +75,11 @@ func CompletedAt(v time.Time) predicate.Task {
 	return predicate.Task(sql.FieldEQ(FieldCompletedAt, v))
 }
 
+// OwnerID applies equality check predicate on the "owner_id" field. It's identical to OwnerIDEQ.
+func OwnerID(v int) predicate.Task {
+	return predicate.Task(sql.FieldEQ(FieldOwnerID, v))
+}
+
 // TitleEQ applies the EQ predicate on the "title" field.
 func TitleEQ(v string) predicate.Task {
 	return predicate.Task(sql.FieldEQ(FieldTitle, v))
@@ -238,6 +243,26 @@ func CompletedAtIsNil() predicate.Task {
 // CompletedAtNotNil applies the NotNil predicate on the "completed_at" field.
 func CompletedAtNotNil() predicate.Task {
 	return predicate.Task(sql.FieldNotNull(FieldCompletedAt))
+}
+
+// OwnerIDEQ applies the EQ predicate on the "owner_id" field.
+func OwnerIDEQ(v int) predicate.Task {
+	return predicate.Task(sql.FieldEQ(FieldOwnerID, v))
+}
+
+// OwnerIDNEQ applies the NEQ predicate on the "owner_id" field.
+func OwnerIDNEQ(v int) predicate.Task {
+	return predicate.Task(sql.FieldNEQ(FieldOwnerID, v))
+}
+
+// OwnerIDIn applies the In predicate on the "owner_id" field.
+func OwnerIDIn(vs ...int) predicate.Task {
+	return predicate.Task(sql.FieldIn(FieldOwnerID, vs...))
+}
+
+// OwnerIDNotIn applies the NotIn predicate on the "owner_id" field.
+func OwnerIDNotIn(vs ...int) predicate.Task {
+	return predicate.Task(sql.FieldNotIn(FieldOwnerID, vs...))
 }
 
 // HasOwner applies the HasEdge predicate on the "owner" edge.

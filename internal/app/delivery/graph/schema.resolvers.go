@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"go-demo/ent/user"
 	"go-demo/internal/pkg/graph/generated"
 	"go-demo/internal/pkg/graph/models"
@@ -30,24 +29,16 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string, email st
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, title string, userID string) (*models.Task, error) {
 	uid, _ := strconv.Atoi(userID)
-	fmt.Println("heheheheh")
-	fmt.Println(uid)
 	owner, err := r.Client.User.Query().Where(user.ID(uid)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("owner: ", owner)
 
 	t, err := r.Client.Task.Create().SetTitle(title).SetOwner(owner[0]).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("heheheheh1")
-	fmt.Println(t)
-	fmt.Println(t.Edges)
-	fmt.Println(t.Edges.Owner)
 	return &models.Task{
 		ID:        strconv.Itoa(t.ID),
 		Title:     t.Title,
@@ -146,10 +137,10 @@ func (r *queryResolver) Tasks(ctx context.Context) ([]*models.Task, error) {
 	return res, nil
 }
 
-// Mutation returns MutationResolver implementation.
+// Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
-// Query returns QueryResolver implementation.
+// Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }

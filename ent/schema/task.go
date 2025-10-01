@@ -19,7 +19,8 @@ func (Task) Fields() []ent.Field {
 		field.String("title"),
 		field.Bool("completed").Default(false),
 		field.Time("created_at").Default(time.Now),
-		field.Time("completed_at").Optional().Nillable(),
+		field.Time("completed_at").Nillable().Optional(),
+		field.Int("owner_id"),
 	}
 }
 
@@ -29,6 +30,7 @@ func (Task) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("owner", User.Type).
 			Ref("tasks").
+			Field("owner_id").
 			Unique().
 			Required(),
 	}

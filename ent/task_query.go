@@ -24,7 +24,6 @@ type TaskQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Task
 	withOwner  *UserQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -370,18 +369,11 @@ func (_q *TaskQuery) prepareQuery(ctx context.Context) error {
 func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, error) {
 	var (
 		nodes       = []*Task{}
-		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
 			_q.withOwner != nil,
 		}
 	)
-	if _q.withOwner != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, task.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Task).scanValues(nil, columns)
 	}
@@ -413,10 +405,7 @@ func (_q *TaskQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*T
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Task)
 	for i := range nodes {
-		if nodes[i].user_tasks == nil {
-			continue
-		}
-		fk := *nodes[i].user_tasks
+		fk := nodes[i].OwnerID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,7 +422,7 @@ func (_q *TaskQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*T
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_tasks" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "owner_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -466,6 +455,9 @@ func (_q *TaskQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != task.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withOwner != nil {
+			_spec.Node.AddColumnOnce(task.FieldOwnerID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

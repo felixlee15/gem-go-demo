@@ -15,7 +15,7 @@ var (
 		{Name: "completed", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "completed_at", Type: field.TypeTime, Nullable: true},
-		{Name: "user_tasks", Type: field.TypeInt},
+		{Name: "owner_id", Type: field.TypeInt},
 	}
 	// TasksTable holds the schema information for the "tasks" table.
 	TasksTable = &schema.Table{

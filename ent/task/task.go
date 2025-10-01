@@ -22,6 +22,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldCompletedAt holds the string denoting the completed_at field in the database.
 	FieldCompletedAt = "completed_at"
+	// FieldOwnerID holds the string denoting the owner_id field in the database.
+	FieldOwnerID = "owner_id"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the task in the database.
@@ -32,7 +34,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	OwnerInverseTable = "users"
 	// OwnerColumn is the table column denoting the owner relation/edge.
-	OwnerColumn = "user_tasks"
+	OwnerColumn = "owner_id"
 )
 
 // Columns holds all SQL columns for task fields.
@@ -42,23 +44,13 @@ var Columns = []string{
 	FieldCompleted,
 	FieldCreatedAt,
 	FieldCompletedAt,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "tasks"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"user_tasks",
+	FieldOwnerID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -98,6 +90,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByCompletedAt orders the results by the completed_at field.
 func ByCompletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCompletedAt, opts...).ToFunc()
+}
+
+// ByOwnerID orders the results by the owner_id field.
+func ByOwnerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOwnerID, opts...).ToFunc()
 }
 
 // ByOwnerField orders the results by owner field.

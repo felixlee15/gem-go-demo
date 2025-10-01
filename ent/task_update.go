@@ -91,9 +91,17 @@ func (_u *TaskUpdate) ClearCompletedAt() *TaskUpdate {
 	return _u
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (_u *TaskUpdate) SetOwnerID(id int) *TaskUpdate {
-	_u.mutation.SetOwnerID(id)
+// SetOwnerID sets the "owner_id" field.
+func (_u *TaskUpdate) SetOwnerID(v int) *TaskUpdate {
+	_u.mutation.SetOwnerID(v)
+	return _u
+}
+
+// SetNillableOwnerID sets the "owner_id" field if the given value is not nil.
+func (_u *TaskUpdate) SetNillableOwnerID(v *int) *TaskUpdate {
+	if v != nil {
+		_u.SetOwnerID(*v)
+	}
 	return _u
 }
 
@@ -286,9 +294,17 @@ func (_u *TaskUpdateOne) ClearCompletedAt() *TaskUpdateOne {
 	return _u
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (_u *TaskUpdateOne) SetOwnerID(id int) *TaskUpdateOne {
-	_u.mutation.SetOwnerID(id)
+// SetOwnerID sets the "owner_id" field.
+func (_u *TaskUpdateOne) SetOwnerID(v int) *TaskUpdateOne {
+	_u.mutation.SetOwnerID(v)
+	return _u
+}
+
+// SetNillableOwnerID sets the "owner_id" field if the given value is not nil.
+func (_u *TaskUpdateOne) SetNillableOwnerID(v *int) *TaskUpdateOne {
+	if v != nil {
+		_u.SetOwnerID(*v)
+	}
 	return _u
 }
 
