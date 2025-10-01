@@ -15,12 +15,12 @@ type DBConfig struct {
 
 func GetDBConfig() DBConfig {
 	return DBConfig{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnv("DB_PORT", "5432"),
-		Name:     getEnv("DB_NAME", "mydb"),
-		Username: getEnv("DB_USERNAME", "myuser"),
-		Password: getEnv("DB_PASSWORD", "mypassword"),
-		SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		Host:     GetEnv("DB_HOST", "localhost"),
+		Port:     GetEnv("DB_PORT", "5432"),
+		Name:     GetEnv("DB_NAME", "mydb"),
+		Username: GetEnv("DB_USERNAME", "myuser"),
+		Password: GetEnv("DB_PASSWORD", "mypassword"),
+		SSLMode:  GetEnv("DB_SSLMODE", "disable"),
 	}
 }
 
@@ -33,7 +33,7 @@ func (c DBConfig) DSN() string {
 		" sslmode=" + c.SSLMode
 }
 
-func getEnv(key, fallback string) string {
+func GetEnv(key, fallback string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
 	}

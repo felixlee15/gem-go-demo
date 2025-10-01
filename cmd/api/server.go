@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -51,6 +52,6 @@ func runServer() {
 	http.Handle("/", playground.Handler("GraphQL Playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Println("Server running at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server running at", config.GetEnv("HOST", "localhost")+":"+config.GetEnv("PORT", "8080"))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", config.GetEnv("HOST", "localhost"), config.GetEnv("PORT", "8080")), nil))
 }
