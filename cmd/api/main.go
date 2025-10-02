@@ -2,15 +2,12 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/getsentry/sentry-go"
@@ -20,10 +17,10 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"go-demo/config"
-	"go-demo/ent"
 	gpgin "go-demo/helper/gin"
 	"go-demo/helper/process"
 	"go-demo/internal/app/delivery/graph"
+	factory "go-demo/internal/pkg/factory/opt"
 	"go-demo/internal/pkg/graph/generated"
 )
 
@@ -45,14 +42,6 @@ func run() error {
 		_ = server.Shutdown(ctx)
 	})
 
-	// Init postgres db
-	dbConfig := config.GetDBConfig()
-	db, err := sql.Open("postgres", dbConfig.DSN())
-	if err != nil {
-		return fmt.Errorf("init db connection failed: %w", err)
-	}
-	defer db.Close()
-
 	r := gpgin.New(&gpgin.Config{
 		CORS: &gpgin.CORSConfig{
 			AllowHeaders: []string{
@@ -68,7 +57,7 @@ func run() error {
 		},
 	})
 
-	h, err := graphqlHandler(db)
+	h, err := graphqlHandler()
 	if err != nil {
 		return fmt.Errorf("init graphql handler failed: %w", err)
 	}
@@ -99,20 +88,14 @@ func run() error {
 	return nil
 }
 
-func graphqlHandler(db *sql.DB) (gin.HandlerFunc, error) {
-	// Ent client
-	drv := entsql.OpenDB(dialect.Postgres, db)
-	client := ent.NewClient(ent.Driver(drv))
-	defer client.Close()
-
-	// Migrate schema
-	if err := client.Schema.Create(context.Background()); err != nil {
-		return nil, fmt.Errorf("create schema failed: %w", err)
-	}
-
+func graphqlHandler() (gin.HandlerFunc, error) {
 	// Graphql server
-	resolver := &graph.Resolver{Client: client}
-	schema := generated.NewExecutableSchema(generated.Config{Resolvers: resolver})
+	useCaseFactory := factory.NewUseCaseFactory()
+	schema := generated.NewExecutableSchema(generated.Config{
+		Resolvers:  graph.NewResolverRoot(useCaseFactory),
+		Complexity: generated.ComplexityRoot{},
+	})
+
 	server := handler.NewDefaultServer(schema)
 
 	return gin.WrapH(server), nil

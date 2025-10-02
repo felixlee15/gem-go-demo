@@ -1,29 +1,7 @@
-scalar Time
-
-type User {
-  id: ID!
-  name: String!
-  email: String!
-  tasks: [Task!]!
-  completedTaskCount: Int!
+schema {
+  query: Query
+  mutation: Mutation
 }
 
-type Task {
-  id: ID!
-  title: String!
-  completed: Boolean!
-  createdAt: Time!
-  completedAt: Time
-  owner: User!
-}
-
-type Query {
-  users: [User!]!
-  tasks: [Task!]!
-}
-
-type Mutation {
-  createUser(name: String!, email: String!): User!
-  createTask(title: String!, userID: ID!): Task!
-  updateTask(taskID: ID!, completed: Boolean!): Task!
-}
+type Query
+type Mutation
