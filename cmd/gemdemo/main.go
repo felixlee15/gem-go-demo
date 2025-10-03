@@ -3,54 +3,62 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	gpgin "github.com/gempages/go-helper/gin"
+	"github.com/gempages/go-helper/process"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 
-	"go-demo/config"
-	gpgin "go-demo/helper/gin"
-	"go-demo/helper/process"
-	"go-demo/internal/app/delivery/graph"
-	factory "go-demo/internal/pkg/factory/opt"
-	"go-demo/internal/pkg/graph/generated"
+	"gemdemo/config"
+	"gemdemo/db"
+	"gemdemo/internal/app/delivery/graph"
+	"gemdemo/internal/pkg/factory"
+	"gemdemo/internal/pkg/graph/generated"
+)
+
+var (
+	appConfig = config.AppConfigs
 )
 
 func main() {
 	logrus.Info("Starting the application...")
 
-	if err := run(); err != nil {
-		logrus.Errorf("application stopped with error: %v", err)
-		os.Exit(1)
-	}
+	executeCommand()
 }
 
-func run() error {
+func executeCommand() {
+	run()
+}
+
+func closeServices() {
+	db.Close()
+}
+
+func run() {
 	server := &http.Server{}
 	shutdownCompleted := process.ShutdownCallback(func() {
 		defer sentry.Flush(2 * time.Second)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		_ = server.Shutdown(ctx)
+		closeServices()
 	})
+
+	db.Init(context.Background())
 
 	r := gpgin.New(&gpgin.Config{
 		CORS: &gpgin.CORSConfig{
 			AllowHeaders: []string{
-				// "X-GemX-Shop-ID",
-				// "X-Shopify-Domain",
-				// "X-Gem-Session",
 				"*",
 			},
-			AllowOriginRegex: config.GetEnv("TRUSTED_ORIGIN_REGEX", ""),
+			AllowOriginRegex: appConfig.App.TrustedOriginRegex,
 		},
 		Logger: &gpgin.LoggerConfig{
 			SkipPaths: []string{"/graphql/query"},
@@ -59,7 +67,7 @@ func run() error {
 
 	h, err := graphqlHandler()
 	if err != nil {
-		return fmt.Errorf("init graphql handler failed: %w", err)
+		logrus.Fatalf("init graphql handler failed: %s", err)
 	}
 
 	g := r.Group("/graphql")
@@ -76,16 +84,14 @@ func run() error {
 		}
 	}
 
-	logrus.Info("Server is running on port: " + config.GetEnv("PORT", "8080"))
-	server.Addr = fmt.Sprintf("%s:%s", config.GetEnv("HOST", "localhost"), config.GetEnv("PORT", "8080"))
+	logrus.Info("Server is running on port: " + appConfig.App.Port)
+	server.Addr = ":" + appConfig.App.Port
 	server.Handler = r.Handler()
 	err = server.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		logrus.Fatalf("Starting server: %s", err)
 	}
 	<-shutdownCompleted
-
-	return nil
 }
 
 func graphqlHandler() (gin.HandlerFunc, error) {

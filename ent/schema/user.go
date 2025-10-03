@@ -11,17 +11,27 @@ type User struct {
 	ent.Schema
 }
 
+func (User) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		SonyFlakeIDMixin{},
+	}
+}
+
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name"),
-		field.String("email").Unique(),
+		field.
+			String("name"),
+		field.
+			String("email").
+			Unique(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tasks", Task.Type),
+		edge.
+			To("tasks", Task.Type),
 	}
 }

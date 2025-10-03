@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -13,14 +11,29 @@ type Task struct {
 	ent.Schema
 }
 
+func (Task) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		SonyFlakeIDMixin{},
+		TimeMixin{},
+	}
+}
+
 // Fields of the Task.
 func (Task) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("title"),
-		field.Bool("completed").Default(false),
-		field.Time("created_at").Default(time.Now),
-		field.Time("completed_at").Nillable().Optional(),
-		field.Int("owner_id"),
+		field.
+			String("title"),
+		field.
+			Bool("completed").
+			Default(false),
+		field.
+			Time("completed_at").
+			Nillable().
+			Optional().
+			StructTag(`json:"completedAt,omitempty"`),
+		field.
+			Uint64("owner_id").
+			StructTag(`json:"ownerID,omitempty"`),
 	}
 }
 
@@ -28,7 +41,8 @@ func (Task) Fields() []ent.Field {
 
 func (Task) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("owner", User.Type).
+		edge.
+			From("owner", User.Type).
 			Ref("tasks").
 			Field("owner_id").
 			Unique().

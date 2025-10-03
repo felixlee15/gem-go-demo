@@ -1,9 +1,9 @@
 package graph
 
 import (
-	"go-demo/internal/app/usecase/task/taskiface"
-	"go-demo/internal/app/usecase/user/useriface"
-	"go-demo/internal/pkg/factory/factoryiface"
+	"gemdemo/internal/app/usecase/task/taskiface"
+	"gemdemo/internal/app/usecase/user/useriface"
+	"gemdemo/internal/pkg/factory/factoryiface"
 )
 
 // This file will not be regenerated automatically.

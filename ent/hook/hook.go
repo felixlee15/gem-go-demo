@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"go-demo/ent"
+	"gemdemo/ent"
 )
 
 // The TaskFunc type is an adapter to allow the use of ordinary

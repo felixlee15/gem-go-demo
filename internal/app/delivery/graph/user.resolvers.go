@@ -6,16 +6,38 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
-	"go-demo/internal/pkg/graph/models"
+	"gemdemo/ent"
+	"gemdemo/internal/pkg/graph/generated"
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string) (*models.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, name string, email string) (*ent.User, error) {
 	return r.UserUseCase.Create(ctx, name, email)
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
+func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
 	return r.UserUseCase.List(ctx)
 }
+
+// Tasks is the resolver for the tasks field.
+func (r *userResolver) Tasks(ctx context.Context, obj *ent.User) ([]*ent.Task, error) {
+	return r.UserUseCase.ListUserTasks(ctx, obj)
+}
+
+// CompletedTaskCount is the resolver for the completedTaskCount field.
+func (r *userResolver) CompletedTaskCount(ctx context.Context, obj *ent.User) (int32, error) {
+	count, err := r.UserUseCase.CountCompleteTasks(ctx, obj)
+	if err != nil {
+		return 0, fmt.Errorf("get complete task count: %w", err)
+	}
+
+	return int32(count), nil
+}
+
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
+type userResolver struct{ *Resolver }

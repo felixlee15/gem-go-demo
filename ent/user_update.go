@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-demo/ent/predicate"
-	"go-demo/ent/task"
-	"go-demo/ent/user"
+	"gemdemo/ent/predicate"
+	"gemdemo/ent/task"
+	"gemdemo/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -57,14 +57,14 @@ func (_u *UserUpdate) SetNillableEmail(v *string) *UserUpdate {
 }
 
 // AddTaskIDs adds the "tasks" edge to the Task entity by IDs.
-func (_u *UserUpdate) AddTaskIDs(ids ...int) *UserUpdate {
+func (_u *UserUpdate) AddTaskIDs(ids ...uint64) *UserUpdate {
 	_u.mutation.AddTaskIDs(ids...)
 	return _u
 }
 
 // AddTasks adds the "tasks" edges to the Task entity.
 func (_u *UserUpdate) AddTasks(v ...*Task) *UserUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -83,14 +83,14 @@ func (_u *UserUpdate) ClearTasks() *UserUpdate {
 }
 
 // RemoveTaskIDs removes the "tasks" edge to Task entities by IDs.
-func (_u *UserUpdate) RemoveTaskIDs(ids ...int) *UserUpdate {
+func (_u *UserUpdate) RemoveTaskIDs(ids ...uint64) *UserUpdate {
 	_u.mutation.RemoveTaskIDs(ids...)
 	return _u
 }
 
 // RemoveTasks removes "tasks" edges to Task entities.
 func (_u *UserUpdate) RemoveTasks(v ...*Task) *UserUpdate {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -125,7 +125,7 @@ func (_u *UserUpdate) ExecX(ctx context.Context) {
 }
 
 func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -147,7 +147,7 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -160,7 +160,7 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -176,7 +176,7 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -233,14 +233,14 @@ func (_u *UserUpdateOne) SetNillableEmail(v *string) *UserUpdateOne {
 }
 
 // AddTaskIDs adds the "tasks" edge to the Task entity by IDs.
-func (_u *UserUpdateOne) AddTaskIDs(ids ...int) *UserUpdateOne {
+func (_u *UserUpdateOne) AddTaskIDs(ids ...uint64) *UserUpdateOne {
 	_u.mutation.AddTaskIDs(ids...)
 	return _u
 }
 
 // AddTasks adds the "tasks" edges to the Task entity.
 func (_u *UserUpdateOne) AddTasks(v ...*Task) *UserUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -259,14 +259,14 @@ func (_u *UserUpdateOne) ClearTasks() *UserUpdateOne {
 }
 
 // RemoveTaskIDs removes the "tasks" edge to Task entities by IDs.
-func (_u *UserUpdateOne) RemoveTaskIDs(ids ...int) *UserUpdateOne {
+func (_u *UserUpdateOne) RemoveTaskIDs(ids ...uint64) *UserUpdateOne {
 	_u.mutation.RemoveTaskIDs(ids...)
 	return _u
 }
 
 // RemoveTasks removes "tasks" edges to Task entities.
 func (_u *UserUpdateOne) RemoveTasks(v ...*Task) *UserUpdateOne {
-	ids := make([]int, len(v))
+	ids := make([]uint64, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
 	}
@@ -314,7 +314,7 @@ func (_u *UserUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "User.id" for update`)}
@@ -353,7 +353,7 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -366,7 +366,7 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -382,7 +382,7 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.TasksColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(task.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-demo/ent/task"
-	"go-demo/ent/user"
+	"gemdemo/ent/task"
+	"gemdemo/ent/user"
 	"reflect"
 	"sync"
 

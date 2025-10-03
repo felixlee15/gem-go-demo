@@ -1,9 +1,9 @@
 package factory
 
 import (
-	"go-demo/internal/app/repository"
-	"go-demo/internal/app/repository/task"
-	"go-demo/internal/app/repository/user"
+	"gemdemo/internal/app/repository"
+	"gemdemo/internal/app/repository/task"
+	"gemdemo/internal/app/repository/user"
 )
 
 type RepositoryFactory struct{}

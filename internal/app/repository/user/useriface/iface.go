@@ -3,10 +3,12 @@ package useriface
 import (
 	"context"
 
-	"go-demo/ent"
+	"gemdemo/ent"
 )
 
 type Repository interface {
 	Create(ctx context.Context, name string, email string) (*ent.User, error)
+	CountCompleteTasks(ctx context.Context, obj *ent.User) (int, error)
 	List(ctx context.Context) ([]*ent.User, error)
+	ListUserTasks(ctx context.Context, obj *ent.User) ([]*ent.Task, error)
 }

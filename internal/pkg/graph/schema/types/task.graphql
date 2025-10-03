@@ -9,6 +9,8 @@ type Task {
 
 extend type Query {
   tasks: [Task!]!
+  task(id: ID!): Task
+  tasksByUser(userID: ID!, completed: Boolean): [Task!]!
 }
 
 extend type Mutation {

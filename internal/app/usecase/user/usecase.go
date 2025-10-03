@@ -3,13 +3,11 @@ package user
 import (
 	"context"
 	"fmt"
-	"strconv"
 
-	"go-demo/ent"
-	"go-demo/internal/app/repository"
-	"go-demo/internal/app/usecase/user/useriface"
-	"go-demo/internal/pkg/factory/factoryiface"
-	"go-demo/internal/pkg/graph/models"
+	"gemdemo/ent"
+	"gemdemo/internal/app/repository"
+	"gemdemo/internal/app/usecase/user/useriface"
+	"gemdemo/internal/pkg/factory/factoryiface"
 )
 
 type useCase struct {
@@ -22,46 +20,38 @@ func NewUseCase(repoFactory factoryiface.RepositoryFactory) useriface.UseCase {
 	}
 }
 
-func (instance *useCase) Create(ctx context.Context, name string, email string) (*models.User, error) {
+func (instance *useCase) Create(ctx context.Context, name string, email string) (*ent.User, error) {
 	user, err := instance.repo.User.Create(ctx, name, email)
 	if err != nil {
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 
-	return entToModel(user), nil
+	return user, nil
 }
 
-func (instance *useCase) List(ctx context.Context) ([]*models.User, error) {
+func (instance *useCase) CountCompleteTasks(ctx context.Context, obj *ent.User) (int, error) {
+	count, err := instance.repo.User.CountCompleteTasks(ctx, obj)
+	if err != nil {
+		return 0, fmt.Errorf("count complete tasks: %w", err)
+	}
+
+	return count, nil
+}
+
+func (instance *useCase) List(ctx context.Context) ([]*ent.User, error) {
 	users, err := instance.repo.User.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list users: %w", err)
 	}
 
-	res := make([]*models.User, len(users))
-	for i, user := range users {
-		res[i] = entToModel(user)
-	}
-
-	return res, nil
+	return users, nil
 }
 
-func entToModel(entUser *ent.User) *models.User {
-	model := &models.User{
-		ID:    strconv.Itoa(entUser.ID),
-		Name:  entUser.Name,
-		Email: entUser.Email,
+func (instance *useCase) ListUserTasks(ctx context.Context, obj *ent.User) ([]*ent.Task, error) {
+	tasks, err := instance.repo.User.ListUserTasks(ctx, obj)
+	if err != nil {
+		return nil, fmt.Errorf("list user tasks: %w", err)
 	}
 
-	tasks := make([]*models.Task, len(entUser.Edges.Tasks))
-	for i, task := range entUser.Edges.Tasks {
-		tasks[i] = &models.Task{
-			ID:        strconv.Itoa(task.ID),
-			Title:     task.Title,
-			Completed: task.Completed,
-		}
-	}
-
-	model.Tasks = tasks
-
-	return model
+	return tasks, nil
 }

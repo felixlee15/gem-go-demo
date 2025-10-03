@@ -7,20 +7,41 @@ package graph
 import (
 	"context"
 
-	"go-demo/internal/pkg/graph/models"
+	"gemdemo/ent"
+	"gemdemo/internal/pkg/graph/generated"
 )
 
 // CreateTask is the resolver for the createTask field.
-func (r *mutationResolver) CreateTask(ctx context.Context, title string, userID string) (*models.Task, error) {
+func (r *mutationResolver) CreateTask(ctx context.Context, title string, userID uint64) (*ent.Task, error) {
 	return r.TaskUseCase.Create(ctx, title, userID)
 }
 
 // UpdateTask is the resolver for the updateTask field.
-func (r *mutationResolver) UpdateTask(ctx context.Context, taskID string, completed bool) (*models.Task, error) {
+func (r *mutationResolver) UpdateTask(ctx context.Context, taskID uint64, completed bool) (*ent.Task, error) {
 	return r.TaskUseCase.Update(ctx, taskID, completed)
 }
 
 // Tasks is the resolver for the tasks field.
-func (r *queryResolver) Tasks(ctx context.Context) ([]*models.Task, error) {
+func (r *queryResolver) Tasks(ctx context.Context) ([]*ent.Task, error) {
 	return r.TaskUseCase.List(ctx)
 }
+
+// Task is the resolver for the task field.
+func (r *queryResolver) Task(ctx context.Context, id uint64) (*ent.Task, error) {
+	return r.TaskUseCase.GetByID(ctx, id)
+}
+
+// TasksByUser is the resolver for the tasksByUser field.
+func (r *queryResolver) TasksByUser(ctx context.Context, userID uint64, completed *bool) ([]*ent.Task, error) {
+	return r.TaskUseCase.GetByUser(ctx, userID, completed)
+}
+
+// Owner is the resolver for the owner field.
+func (r *taskResolver) Owner(ctx context.Context, obj *ent.Task) (*ent.User, error) {
+	return r.TaskUseCase.GetOwner(ctx, obj)
+}
+
+// Task returns generated.TaskResolver implementation.
+func (r *Resolver) Task() generated.TaskResolver { return &taskResolver{r} }
+
+type taskResolver struct{ *Resolver }

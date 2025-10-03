@@ -3,8 +3,9 @@
 package ent
 
 import (
-	"go-demo/ent/schema"
-	"go-demo/ent/task"
+	"gemdemo/ent/schema"
+	"gemdemo/ent/task"
+	"gemdemo/ent/user"
 	"time"
 )
 
@@ -12,14 +13,38 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	taskMixin := schema.Task{}.Mixin()
+	taskMixinFields0 := taskMixin[0].Fields()
+	_ = taskMixinFields0
+	taskMixinFields1 := taskMixin[1].Fields()
+	_ = taskMixinFields1
 	taskFields := schema.Task{}.Fields()
 	_ = taskFields
+	// taskDescCreatedAt is the schema descriptor for created_at field.
+	taskDescCreatedAt := taskMixinFields1[0].Descriptor()
+	// task.DefaultCreatedAt holds the default value on creation for the created_at field.
+	task.DefaultCreatedAt = taskDescCreatedAt.Default.(func() time.Time)
+	// taskDescUpdatedAt is the schema descriptor for updated_at field.
+	taskDescUpdatedAt := taskMixinFields1[1].Descriptor()
+	// task.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	task.DefaultUpdatedAt = taskDescUpdatedAt.Default.(func() time.Time)
+	// task.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	task.UpdateDefaultUpdatedAt = taskDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// taskDescCompleted is the schema descriptor for completed field.
 	taskDescCompleted := taskFields[1].Descriptor()
 	// task.DefaultCompleted holds the default value on creation for the completed field.
 	task.DefaultCompleted = taskDescCompleted.Default.(bool)
-	// taskDescCreatedAt is the schema descriptor for created_at field.
-	taskDescCreatedAt := taskFields[2].Descriptor()
-	// task.DefaultCreatedAt holds the default value on creation for the created_at field.
-	task.DefaultCreatedAt = taskDescCreatedAt.Default.(func() time.Time)
+	// taskDescID is the schema descriptor for id field.
+	taskDescID := taskMixinFields0[0].Descriptor()
+	// task.DefaultID holds the default value on creation for the id field.
+	task.DefaultID = taskDescID.Default.(func() uint64)
+	userMixin := schema.User{}.Mixin()
+	userMixinFields0 := userMixin[0].Fields()
+	_ = userMixinFields0
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescID is the schema descriptor for id field.
+	userDescID := userMixinFields0[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() uint64)
 }

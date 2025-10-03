@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in go-demo/ent/runtime.go
+// The schema-stitching logic is generated in gemdemo/ent/runtime.go
 
 const (
 	Version = "v0.14.5"                                         // Version of ent codegen.

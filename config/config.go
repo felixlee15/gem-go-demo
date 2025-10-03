@@ -1,6 +1,20 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
+type config struct {
+	App      appConfig
+	Database *DBConfig
+}
+
+type appConfig struct {
+	Port               string
+	TrustedOriginRegex string
+}
 
 type DBConfig struct {
 	Host         string
@@ -13,14 +27,30 @@ type DBConfig struct {
 	MaxIdleConns *int
 }
 
-func GetDBConfig() DBConfig {
-	return DBConfig{
-		Host:     GetEnv("DB_HOST", "localhost"),
-		Port:     GetEnv("DB_PORT", "5432"),
-		Name:     GetEnv("DB_NAME", "mydb"),
-		Username: GetEnv("DB_USERNAME", "myuser"),
-		Password: GetEnv("DB_PASSWORD", "mypassword"),
-		SSLMode:  GetEnv("DB_SSLMODE", "disable"),
+var (
+	AppConfigs *config
+)
+
+func init() {
+	_ = godotenv.Load()
+
+	AppConfigs = &config{
+		App: appConfig{
+			TrustedOriginRegex: os.Getenv("TRUSTED_ORIGIN_REGEX"),
+			Port:               os.Getenv("PORT"),
+		},
+		Database: getDBConfig(),
+	}
+}
+
+func getDBConfig() *DBConfig {
+	return &DBConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Name:     os.Getenv("DB_NAME"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
 	}
 }
 
@@ -31,11 +61,4 @@ func (c DBConfig) DSN() string {
 		" password=" + c.Password +
 		" dbname=" + c.Name +
 		" sslmode=" + c.SSLMode
-}
-
-func GetEnv(key, fallback string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return fallback
 }

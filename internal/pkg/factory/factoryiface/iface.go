@@ -1,9 +1,9 @@
 package factoryiface
 
 import (
-	"go-demo/internal/app/repository"
-	"go-demo/internal/app/usecase/task/taskiface"
-	"go-demo/internal/app/usecase/user/useriface"
+	"gemdemo/internal/app/repository"
+	"gemdemo/internal/app/usecase/task/taskiface"
+	"gemdemo/internal/app/usecase/user/useriface"
 )
 
 type UseCaseFactory interface {
